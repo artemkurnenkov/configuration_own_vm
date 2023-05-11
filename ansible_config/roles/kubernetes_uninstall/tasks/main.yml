@@ -1,0 +1,64 @@
+---
+# tasks file for kubernetes_uninstall
+
+- name: Uninstalling minikube
+  tags: uninstall_minikube
+  become: true
+  block:
+
+    - name: Check the availability of minikube
+      ansible.builtin.stat:
+        path: "{{ bin_path }}/minikube"
+      register: minikube
+
+    - name: Deleting containers
+      ansible.builtin.shell:
+        cmd: "minikube delete"
+      when: minikube.stat.exists == True
+
+    - name: Deleting binary files
+      ansible.builtin.file:
+        state: absent
+        dest: "{{ bin_path }}/minikube"
+
+
+- name: Uninstalling autocomplete for kubectl
+  tags: uninstall_autocomplete_for_kubectl
+  become: True
+  block:
+
+    - name: Deleting information about kubectl, autocompletion from ~/.bashrc
+      ansible.builtin.lineinfile:
+        state: absent
+        path: "{{ home_path }}/.bashrc"
+        line: "{{ item }}"
+      loop:
+        - source <(kubectl completion bash)
+        - alias k=kubectl
+        - complete -o default -F __start_kubectl k
+
+
+- name: Uninstalling kubectl
+  tags: uninstall_kubectl
+  become: True
+  block:
+
+    - name: Uninstalling kubectl utility
+      ansible.builtin.apt:
+        state: absent
+        name:
+          - kubectl
+        update_cache: True
+    
+    - name: Uninstalling a stable repository
+      ansible.builtin.apt_repository:
+        state: absent
+        repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+        update_cache: true
+        filename: kubernetes
+
+    - name: Uninstalling a key for kubernetes repository
+      ansible.builtin.apt_key:
+        state: absent
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+

@@ -1,0 +1,70 @@
+---
+# tasks file for kubernetes_install
+
+- name: Installing kubectl
+  tags: install_kubectl
+  become: true
+  block:
+
+    - name: Installing the necessary packages
+      ansible.builtin.apt:
+        state: present
+        name:
+          - ca-certificates
+          - curl
+          - apt-transport-https
+        update_cache: true
+        cache_valid_time: 86400
+
+    - name: Adding key for kubernetes repository
+      ansible.builtin.apt_key:
+        state: present
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+
+    - name: Installing a stable repository
+      ansible.builtin.apt_repository:
+        state: present
+        repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+        update_cache: true
+        filename: kubernetes
+
+    - name: Installing kubectl
+      ansible.builtin.apt:
+        state: present
+        name:
+          - kubectl
+        update_cache: true
+
+
+- name: Installing kubectl autocompletion
+  tags: install_autocompletion
+  become: true
+  block:
+
+    - name: Installing bash-completion
+      ansible.builtin.apt:
+        state: present
+        name:
+          - bash-completion
+        update_cache: true
+
+    - name: Updating ~/.bashrc
+      ansible.builtin.lineinfile:
+        dest: "{{ home_path }}/.bashrc"
+        line: "{{ item }}"
+      loop:
+        - source <(kubectl completion bash)
+        - alias k=kubectl
+        - complete -o default -F __start_kubectl k
+
+
+- name: Installing minikube
+  tags: install_minikube
+  become: true
+  block:
+
+    - name: Downloading packages to install minikube
+      ansible.builtin.get_url:
+        url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+        dest: /usr/local/bin/minikube
+        mode: 0755

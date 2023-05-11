@@ -1,0 +1,8 @@
+---
+- name: Installing tools
+  hosts: localhost
+  roles:
+    - role: kubernetes_install
+      tags: kubernetes_install
+    - role: kubernetes_uninstall
+      tags: kubernetes_uninstall

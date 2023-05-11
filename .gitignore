@@ -1,0 +1,10 @@
+# Vagrant
+.vagrant
+
+# IDE
+.idea/
+.vscode
+.DS_Store
+
+# Ansible
+*.retry

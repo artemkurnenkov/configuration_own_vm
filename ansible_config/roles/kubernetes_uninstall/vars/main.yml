@@ -1,0 +1,5 @@
+---
+# vars file for kubernetes_install
+
+bin_path: /usr/local/bin
+home_path: /home/vagrant

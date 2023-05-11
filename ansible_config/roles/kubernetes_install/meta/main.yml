@@ -1,0 +1,14 @@
+galaxy_info:
+  author: Artem Kurnenkov
+  description: This role allows you to install kubectl, kubectl autocompletion and minikube
+  company: your company (optional)
+  license: MIT
+  min_ansible_version: 2.1
+  platforms:
+  - name: Ubuntu
+    versions:
+      - all
+  galaxy_tags: []
+
+dependencies: []
+
